@@ -3,11 +3,15 @@
 #include <time.h>
 
 
+// define variavel de altura e largura do tabuleiro
 int lxc;
+//variavel de chance de ocorrer bombas, o que define a dificuldade do jogo
 int facil;
 
 void init(){
-
+    
+  // função que pede ao jogador o tamanho do tabuleiro e a facilidade do jogo  
+  
   int tamTab=0;
   do{
       printf("tamanho do tabuleiro (max: 26): ");
@@ -16,30 +20,41 @@ void init(){
       lxc = tamTab + 1;
   }while(tamTab>26);
 
-  printf("Nivel de facilidade (quanto maior menos bombas): ");
+  do{
+  printf("Nivel de facilidade (quanto maior menos bombas) (max: 9): ");
   int facilc;
   scanf("%i", &facilc);
   facil = facilc + 1;
   getchar();
+  } while (facil > 10);
 }
 
 void drawGrid(){
+  //------------------------------------
+  // contrói o tabuleiro e inicia o jogo 
+  //------------------------------------
+  
   srand(time(NULL));
   
-  int posicionaBomba;
+  int posicionaBomba; // guarda um valor aleatorio entre 0 e a facilidade escolhida pelo jogador
 
-  char grid[lxc][lxc];
-  int bomb[lxc][lxc];
+  char grid[lxc][lxc]; // tabuleiro
+  int bomb[lxc][lxc]; // tabuleiro de bombas, invisivel ao jogador
 
+  // define as posições das bombas
   for(int i=0; i<lxc;i++){
     for(int j=0; j<lxc;j++){
-      posicionaBomba = rand() % 4;
+      posicionaBomba = rand() % facil;
       bomb[i][j] = posicionaBomba;
       //printf("%i ", bomb[i][j]);
     }
     //printf("\n");
   }
-
+  //=============================================================================
+  
+  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ // contrói as laterais do tabuleiro, com as coordenadas
   for(int i=0;i<=lxc;i++){
     char j = 'a'+i-1;
     grid[0][i] = j;
@@ -47,7 +62,10 @@ void drawGrid(){
   for(int i=1;i<=lxc;i++){
     grid[i][0] = 'a'+i-1;
   }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+//- - - - - - - - - - - - - - - - - - - -
+// controi o tabuleiro e imprime na tela
   for(int i=1;i<=lxc-1;i++){
     for(int j=1;j<=lxc-1;j++){
       grid[i][j] = '-';
@@ -60,35 +78,41 @@ void drawGrid(){
     }
     printf("\n");
   }
+  //- - - - - - - - - - - - - - - - - - - -
 
-
+//------------------------------------------------
+    // loop update do jogo
+//------------------------------------------------
   while(1){
+     
+    //reinicia as jogadas e os contadores
     char linha = '.', coluna = '.';
     int poslin = 999, poscol = 999;
 
-
+    //pede a jogada
     printf("sua jogada [linha]x[coluna] ");
     scanf("%cx%c", &linha, &coluna);
     getchar();
 
+    //navega pelas linhas e colunas e registra a posição no tabuleiro atacada
     for(int i = 0; i<=lxc;i++){
 
       if (grid[i][0] == linha){
         
         poslin = i;
-        //printf("\n%c poslin-%i", grid[i][0], poslin);
       }
       if (grid[0][i] == coluna){
         poscol = i;
-        //printf("\n%c poscol-%i\n", grid[0][i], poscol);
       }
       if(poscol!=999 && poslin!=999){
         i=lxc+1;
       }
     }
-    //printf("%ix%i = %i\n",poslin, poscol, bomb[poslin][poscol]);
-
+    
+    // checa no tabuleiro de bombas se na posição atacada há uma bomba
     if(bomb[poslin][poscol] == 0){
+        
+      // se sim,imprime a derrota e revela as posições das bombas no tabuleiro visivel
       printf("\nexplodiu\n");
       system("cls");
       for(int e=1;e<lxc;e++){
@@ -97,23 +121,32 @@ void drawGrid(){
             grid[e][x] = 'X';
           }
         }
-      }
-          for(int i=0;i<=lxc-1;i++){
+      } 
+    for(int i=0;i<=lxc-1;i++){
       for(int j=0;j<=lxc-1;j++){
         printf("%c ", grid[i][j]);
-    }
+        }
     printf("\n");
-  }
+    }
+    
       printf("\nVoce perdeu");
       break;
       }
     else if (grid[poslin][poscol] == '-'){
+        
+      /* se não, checa se a posição ainda não foi atacada, se sim, abre uma area vazia, 
+      revela a bombas dentro da area e informa quantas bombas estão nas proximidades das bordas
+      */
+      
       int contBombRaio = 0;
       int contadorArea = 0;
       int subdesc = 0;
       for(int pl=poslin-4;pl<=poslin+4;pl++){
         for (int pc=poscol-contadorArea;pc<=poscol+contadorArea;pc++){
           
+          /* confere no tabuleiro de bombas se na posição na area atacada é uma bomba,
+          se sim atualiza ela no tabuleiro de jogo, se não, atualiza para um espaço vazio
+          */
           if(pl >0 && pc > 0 && pl<lxc && pc<lxc){
             if(bomb[pl][pc]!=0){
               grid[pl][pc]=' ';
@@ -123,15 +156,14 @@ void drawGrid(){
               
           }
           
+          // conta as bombas proxima da borda e atualiza a quantidade
           if (pc == poscol-contadorArea){
             
             for(int i=pl-1;i<=pl+1;i++){
               for(int j=pc-1;j<=pc+1;j++){
-                //printf("\n%ix%i", i, j);
                 if(bomb[i][j]==0){
                   
                   contBombRaio += 1;
-                  //printf("\n%ix%i - %i", pl, pc, contBombRaio);
                 }
               }
             }
@@ -146,7 +178,6 @@ void drawGrid(){
               for(int j=pc-1;j<=pc+1;j++){
                 if(bomb[i][j]==0){
                   contBombRaio += 1;
-                  //printf("\n%ix%i", pl, pc);
                 }
               }
             }
@@ -157,6 +188,7 @@ void drawGrid(){
           }
           
 
+        // contador para construção do losango (area atacada)
         }
         if(contadorArea == 4){
           subdesc = 1;
@@ -167,9 +199,12 @@ void drawGrid(){
           contadorArea -=1;
         }
       }
+      
+      
     }
     system("cls");
-
+    
+    // imprime o tabuleiro atualizado
     for(int i=0;i<=lxc-1;i++){
       for(int j=0;j<=lxc-1;j++){
         
@@ -178,19 +213,23 @@ void drawGrid(){
     printf("\n");
   }
 
+
+  // checa se o jogo acabou, se sim informa a vitoria e encerra o jogo
   int bombFalta=0;
-  for(int i=0;i<=lxc;i++){
-    for(int j=0;j<=lxc;j++){
-      if(grid[i][j] != '-' && bomb[i][j] == 0){
+  for(int i=1;i<=lxc;i++){
+    for(int j=1;j<=lxc;j++){
+      if(grid[i][j] == '-' && bomb[i][j] == 0){
         bombFalta += 1;
       }
     }
   }
+  printf("\n%i bombas faltando\n", bombFalta);
 
   if(bombFalta == 0){
     printf("Voce ganhou");
     break;
   }
+  
 
   }
 
