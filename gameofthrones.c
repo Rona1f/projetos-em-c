@@ -68,7 +68,7 @@ void gameFunc(){
   while(1){
   printf("Movimento (W/A/S/D) Vidas: %i: \n", vidaJon);
   
-  char move[1];
+  char move[2];
   fgets(move, 2, stdin);
 
 //===========================================================
@@ -151,7 +151,7 @@ void gameFunc(){
 
     if(tentVitoria <=2){
       //luta contra Cersei
-      //system("cls");
+      system("cls");
       printf("A negociação não deu certo.\n Westeros declarou guerra!");
       int lutaAcabou=0;
       int vidaCersei=100;
@@ -195,7 +195,7 @@ void gameFunc(){
           }
         }
 
-        //system("cls");
+        system("cls");
 
 
 
@@ -212,7 +212,7 @@ void gameFunc(){
   }
   
 
-  //system("cls");
+  system("cls");
 
           //Chega ao rei da noite
         if(posjon[0] >= gridsize-3 && posjon[0] <= gridsize-1 && posjon[1] >= gridsize-3 && posjon[1] <= gridsize-1 && resultadoLutaJonCersei == 1){
@@ -269,7 +269,7 @@ void gameFunc(){
           exit(0);
         }
 
-        //system("cls");
+        system("cls");
           }
         }
   //imprime o cenario atualizado      
