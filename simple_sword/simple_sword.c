@@ -32,7 +32,7 @@ typedef struct Enemy {
 } Enemy;
 
 
-#define MAX_ENEMIES 6
+#define MAX_ENEMIES 2
 
 #define DIR_NEUTRO 0
 #define DIR_RIGHT 1
@@ -82,6 +82,7 @@ int main(){
     Texture2D monster = LoadTexture("monster.png");
     Texture2D valk = LoadTexture("valk.png");
     Texture2D rock = LoadTexture("rock.png");
+    Texture2D floor = LoadTexture("floor.png");
     
     Rectangle rockrec = {0,0,rock.width, rock.height};
     
@@ -94,6 +95,7 @@ int main(){
         
         BeginDrawing();
         ClearBackground(BLACK);
+        DrawTexture(floor, 0,0,WHITE);
         
         DrawText(TextFormat("%i", dirCol), 50, 50, 18, WHITE);
         
@@ -276,7 +278,7 @@ void initGame(void){
     
     //initialize enemy
     for(int i =0; i < MAX_ENEMIES;i++){
-        int spd = (rand() % 4);
+        int spd = (rand() % 3 + 1);
         
     enemy[i].rec.x = rand() % screenWidth;
     enemy[i].rec.y = rand() % screenHeight;

@@ -3,6 +3,13 @@
 #include <time.h>
 
 
+void delay(unsigned int milliseconds){
+    //int milliseconds = seconds*1000;
+    clock_t start = clock();
+
+    while((clock() - start) * 1000 / CLOCKS_PER_SEC < milliseconds);
+}
+
 
 void gameFunc(){
   
@@ -10,7 +17,7 @@ void gameFunc(){
   int vidaJon = 100;
   int resultadoLutaJonCersei=0;
   
-  
+  delay(3);
   srand(time(NULL));
 
   
@@ -145,7 +152,7 @@ void gameFunc(){
       getchar();
       resTenta[i] = rand() % 101;
       if(resTenta[i] >=60){
-        tentVitoria += 1;
+        tentVitoria += 0;
       }
     }
 
@@ -173,8 +180,12 @@ void gameFunc(){
         printf("\n");
         
         printf("\nenter para atacar! ");
+        
         getchar();
-
+        for(int i=0;i<20;i++) {
+                  delay(70);
+                  printf(".");
+                  }
         int taxaDeAtaque = rand() % 101;
 
         if(taxaDeAtaque >=50){
