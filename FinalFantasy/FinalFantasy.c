@@ -1,6 +1,7 @@
 #include <stdio.h> 
 #include <time.h> 
 #include <stdlib.h>
+#include <string.h>
 
 #define TAMTIME 4
 
@@ -44,9 +45,8 @@ void carregando(float seconds, int pontos){
   printf("\n");
 }
 
-// Driver code to test above function 
-int main() 
-{srand(time(NULL)); 
+
+int main() {srand(time(NULL)); 
 
 	iniciarTimes();
   int timequecomeca = definirTimequeComeca();
@@ -54,10 +54,9 @@ int main()
   printf("definindo time que inicia");
   carregando(0.3, 5);
   printf("O time %i inicia atacando", timequecomeca);
-  carregando(0.2,10);
-  delay(3);
+  carregando(0.3,10);
   
-  jogar(time1, time2);
+  jogar();
 	return 0; 
 } 
 
@@ -67,24 +66,26 @@ void iniciarTimes(){
     time1[i].id = i;
       
     printf("Time 1 - Nome do lutador: ");
-    scanf("%s", time1[i].nome);
-    //fgets(time1[i].nome, 20, stdin);
-
+    //scanf("%s", time1[i].nome);
+    fgets(time1[i].nome, 20, stdin);
+    time1[i].nome[strlen(time1[i].nome)-1]='\0';
+    
     time1[i].vida = 100;
-    time1[i].ataque = rand() % 11;
-    time1[i].defesa = rand() % 11;
+    time1[i].ataque = rand() % 10+1;
+    time1[i].defesa = rand() % 10+1;
     printf("\n");
   }
   for(int i=0;i<TAMTIME;i++){
     time2[i].id = i;
       
     printf("Time 2 - Nome do lutador: ");
-    scanf("%s", time2[i].nome);
-    //fgets(time2[i].nome, 20, stdin);
-
+    //scanf("%s", time2[i].nome);
+    fgets(time2[i].nome, 20, stdin);
+    time2[i].nome[strlen(time2[i].nome)-1]='\0';
+    
     time2[i].vida = 100;
-    time2[i].ataque = rand() % 11;
-    time2[i].defesa = rand() % 11;
+    time2[i].ataque = rand() % 10+1;
+    time2[i].defesa = rand() % 10+1;
     printf("\n");
   }
   printf("Times definidos\n");
@@ -135,7 +136,7 @@ void jogar(){
 
 void atacar(Times* jogadorqueataca, int id_ataque, Times* jogadorquedefende, int id_defesa){
     
-    float precisao = 100 - (jogadorqueataca[id_ataque].ataque*jogadorqueataca[id_ataque].defesa);
+    float precisao = 100 - jogadorqueataca[id_ataque].vida*jogadorqueataca[id_ataque].ataque/10;
     if(rand()%101 > precisao){
         printf("\nAcertou o ataque!");
         carregando(0.4,3);
@@ -150,7 +151,7 @@ void atacar(Times* jogadorqueataca, int id_ataque, Times* jogadorquedefende, int
 }
 
 void atualizarVida(Times* jogadorqueataca, int id_ataque, Times* jogadorquedefende, int id_defesa){
-    jogadorquedefende[id_defesa].vida = jogadorquedefende[id_defesa].vida - jogadorqueataca[id_ataque].ataque/jogadorquedefende[id_defesa].defesa;
+    jogadorquedefende[id_defesa].vida = jogadorquedefende[id_defesa].vida - (jogadorqueataca[id_ataque].ataque/jogadorquedefende[id_defesa].defesa + rand()%20+10);
 }
 
 void atualizarTela(Times* time_1, Times* time_2){
@@ -161,23 +162,3 @@ void atualizarTela(Times* time_1, Times* time_2){
     
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
