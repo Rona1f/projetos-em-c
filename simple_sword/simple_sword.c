@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <math.h>
 
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>
@@ -32,8 +33,16 @@ typedef struct Enemy {
     Vector2 prevPos;
 } Enemy;
 
+typedef struct Bala {
+    Rectangle rec;
+    Vector2 speed;
+    Color color;
+    bool active;
+    int quadrant;
+} Bala;
 
-#define MAX_ENEMIES 2
+#define MAX_ENEMIES 0
+#define NUM_SHOOTS 50
 
 #define DIR_NEUTRO 0
 #define DIR_RIGHT 1
@@ -52,6 +61,7 @@ static int enemies_remaining = MAX_ENEMIES;
 
 static int dirCol = DIR_NEUTRO;
 static int orient;
+static int currentShoot=0;
 
 static bool gameOver = false;
 static bool pause =  false;
@@ -61,6 +71,7 @@ static bool victory = false;
 static Player player;
 static Enemy enemy[MAX_ENEMIES];
 static Axe axe;
+static Bala bala[NUM_SHOOTS];
 
 
 
@@ -76,8 +87,7 @@ void delay(float seconds){
 int contDiag = 0;
 char texto[200];
 char* dialogo(char* text, float seconds, int i){
-
-        
+      
         printf("%i", i);
         if(i<1) {
             strcpy(texto, " ");
@@ -100,6 +110,8 @@ char* dialogo(char* text, float seconds, int i){
     
     return texto;
 }
+
+
 
 int main(){
     srand(time(NULL));
@@ -156,6 +168,7 @@ int main(){
             
             
             DrawRectangleRec(axe.rec, axe.color);
+            
             
             if(IsKeyPressed(KEY_SPACE)){
                 axe.active=true;
@@ -228,12 +241,58 @@ int main(){
             }
             
             
+            //TESTE DE TIRO
+            if(IsKeyPressed(KEY_SPACE)) {
+                if(abs(player.rec.x-bala[currentShoot].rec.x)>abs(player.rec.y-bala[currentShoot].rec.y)){
+                    bala[currentShoot].speed.x = 5;
+                   
+                    float porcento = (((abs(player.rec.x-bala[currentShoot].rec.x))-(abs(player.rec.y-bala[currentShoot].rec.y)))*100)/(abs(player.rec.x-bala[currentShoot].rec.x));
+                    bala[currentShoot].speed.y = 5-( (porcento/100)*5 );
+                }
+                if(abs(player.rec.x-bala[currentShoot].rec.x)<abs(player.rec.y-bala[currentShoot].rec.y)){
+                    bala[currentShoot].speed.y = 5;
+                    
+                    float porcento = (((abs(player.rec.y-bala[currentShoot].rec.y))-(abs(player.rec.x-bala[currentShoot].rec.x)))*100)/(abs(player.rec.y-bala[currentShoot].rec.y));
+                    bala[currentShoot].speed.x = 5-( (porcento/100)*5 );
+                }
+                if(player.rec.x>bala[currentShoot].rec.x && player.rec.y<bala[currentShoot].rec.y) bala[currentShoot].quadrant = 1;
+                if(player.rec.x<bala[currentShoot].rec.x && player.rec.y<bala[currentShoot].rec.y) bala[currentShoot].quadrant = 2;
+                if(player.rec.x<bala[currentShoot].rec.x && player.rec.y>bala[currentShoot].rec.y) bala[currentShoot].quadrant = 3;
+                if(player.rec.x>bala[currentShoot].rec.x && player.rec.y>bala[currentShoot].rec.y) bala[currentShoot].quadrant = 4;
+                
+                bala[currentShoot].active = true;
+                currentShoot+=1;
+                
+            }
+            for(int s=0;s<NUM_SHOOTS;s++){
+            if(bala[s].active==true){
+                if(bala[s].quadrant==1){
+                    bala[s].rec.x += bala[s].speed.x;
+                    bala[s].rec.y -= bala[s].speed.y;
+                }
+                if(bala[s].quadrant==2){
+                    bala[s].rec.x -= bala[s].speed.x;
+                    bala[s].rec.y -= bala[s].speed.y;
+                }
+                if(bala[s].quadrant==3){
+                    bala[s].rec.x -= bala[s].speed.x;
+                    bala[s].rec.y += bala[s].speed.y;
+                }
+                if(bala[s].quadrant==4){
+                    bala[s].rec.x += bala[s].speed.x;
+                    bala[s].rec.y += bala[s].speed.y;
+                }
+                DrawRectangleRec(bala[s].rec, bala[s].color);
+                if(bala[s].rec.x>screenWidth || bala[s].rec.x<0 || bala[s].rec.y>screenHeight || bala[s].rec.y<0) {
+                    bala[s].rec.x = 100;
+                    bala[s].rec.y = 100;
+                    bala[s].active = false;
+                    
+                }
+            }
+            }
+            if(currentShoot>=NUM_SHOOTS) currentShoot=0;
             
-            
-            //if(dirCol == DIR_RIGHT && IsKeyDown(KEY_LEFT)) player.rec.x -= player.speed.x;
-            //if(dirCol == DIR_LEFT && IsKeyDown(KEY_RIGHT)) player.rec.x += player.speed.x;
-            //if(dirCol == DIR_UP && IsKeyDown(KEY_DOWN)) player.rec.y += player.speed.y;
-            //if(dirCol == DIR_DOWN && IsKeyDown(KEY_UP)) player.rec.y -= player.speed.y;
             
             //enemies movement
             for(int i=0;i<MAX_ENEMIES;i++){
@@ -344,6 +403,16 @@ void initGame(void){
     axe.active = false;
     axe.direction = DIR_RIGHT;
     axe.color = SKYBLUE;
+    
+    //initialize bala
+    for(int i=0;i<NUM_SHOOTS;i++){
+    bala[i].rec.x = 100;
+    bala[i].rec.y = 100;
+    bala[i].rec.width = 10;
+    bala[i].rec.height = 10;
+    bala[i].active = false;
+    bala[i].color = RED;
+    }
     
     enemies_remaining = MAX_ENEMIES;
     
