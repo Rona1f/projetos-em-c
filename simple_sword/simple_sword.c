@@ -1,6 +1,7 @@
 #include <raylib.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>
@@ -65,6 +66,41 @@ static Axe axe;
 
 static void initGame(void);
 
+void delay(float seconds){
+    float milliseconds = seconds*1000;
+    clock_t start = clock();
+
+    while((clock() - start) * 1000 / CLOCKS_PER_SEC < milliseconds);
+}
+
+int contDiag = 0;
+char texto[200];
+char* dialogo(char* text, float seconds, int i){
+
+        
+        printf("%i", i);
+        if(i<1) {
+            strcpy(texto, " ");
+            for(int j=0;j<200;j++){
+                texto[j]=' ';
+            }
+            printf("strlen: %i\n", strlen(text));
+            }
+        texto[i] = text[i];
+            
+        delay(seconds);
+        
+        
+        if(i>strlen(text)) {
+            int* p = &contDiag;
+            *p = 200;
+            printf("---%i---", i);
+            
+            } 
+    
+    return texto;
+}
+
 int main(){
     srand(time(NULL));
     
@@ -97,7 +133,7 @@ int main(){
         ClearBackground(BLACK);
         DrawTexture(floor, 0,0,WHITE);
         
-        DrawText(TextFormat("%i", dirCol), 50, 50, 18, WHITE);
+        //DrawText(TextFormat("%i", dirCol), 50, 50, 18, WHITE);
         
         DrawTextureRec(rock, rockrec, (Vector2){200, 100}, WHITE);
         
@@ -225,6 +261,7 @@ int main(){
             
             
             
+            
             for(int i=0;i<MAX_ENEMIES;i++){
                 if(CheckCollisionRecs(player.rec, enemy[i].rec)){ 
                      if(enemy[i].active==true){
@@ -235,17 +272,24 @@ int main(){
             }
             
         } else {
+            //char out[] = dialogo("voce perdeu que pena gameover", 0.2, contDiag);
+            
+            DrawText(TextFormat("%s", dialogo("voce perdeu que pena gameover", 0.05, contDiag++)), 50, 50, 18, WHITE);
             ClearBackground(RED);
             DrawText("GAME OVER\nenter to play again", screenWidth*3.3/10, screenHeight*4.4/10, 40, BLACK);
-            if(IsKeyPressed(KEY_ENTER)) gameOver = false;
+        if(IsKeyPressed(KEY_ENTER)) {
+            gameOver = false;
+            contDiag=0;
+            }
         }
         
         if (victory == true) {
             ClearBackground(GREEN);
-            DrawText("YOU WON\nenter to play again", screenWidth*3.3/10, screenHeight*4.4/10, 40, WHITE);
+            DrawText(TextFormat("%s", dialogo("voce venceu parabens\naperte enter pra jogar novamente", 0.02, contDiag++)), screenWidth*2.4/10, screenHeight*3/10, 40, WHITE);
             if(IsKeyPressed(KEY_ENTER)){ 
             victory = false;
             initGame();
+            contDiag=0;
             }
         }
         
@@ -260,7 +304,6 @@ int main(){
         }
     
     }
-    
     
 }
 
