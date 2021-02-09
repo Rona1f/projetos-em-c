@@ -45,10 +45,18 @@ void carregando(float seconds, int pontos){
   printf("\n");
 }
 
+void dialogo(char* text, float seconds){
+    
+    for(int i=0;i<strlen(text);i++){
+        printf("%c", text[i]);
+        delay(seconds);
+    }
+}
+
 
 int main() {srand(time(NULL)); 
-
-	iniciarTimes();
+    dialogo("bem vindo", 0.5);
+    iniciarTimes();
   int timequecomeca = definirTimequeComeca();
   timedavez = timequecomeca;
   printf("definindo time que inicia");
